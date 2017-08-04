@@ -4,7 +4,7 @@
 #
 Name     : lensfun
 Version  : 0.3.2
-Release  : 2
+Release  : 3
 URL      : https://sourceforge.net/projects/lensfun/files/0.3.2/lensfun-0.3.2.tar.gz
 Source0  : https://sourceforge.net/projects/lensfun/files/0.3.2/lensfun-0.3.2.tar.gz
 Summary  : No detailed summary available
@@ -62,15 +62,33 @@ lib components for the lensfun package.
 %setup -q -n lensfun-0.3.2
 
 %build
+export http_proxy=http://127.0.0.1:9/
+export https_proxy=http://127.0.0.1:9/
+export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
+export SOURCE_DATE_EPOCH=1501847627
 mkdir clr-build
 pushd clr-build
-cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=%{_libdir} -DCMAKE_AR=/usr/bin/gcc-ar -DLIB_SUFFIX=64 -DCMAKE_RANLIB=/usr/bin/gcc-ranlib
+cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib64 -DCMAKE_AR=/usr/bin/gcc-ar -DLIB_SUFFIX=64 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_RANLIB=/usr/bin/gcc-ranlib
 make VERBOSE=1  %{?_smp_mflags}
+popd
+mkdir clr-build-avx2
+pushd clr-build-avx2
+export CFLAGS="$CFLAGS -march=haswell"
+export CXXFLAGS="$CXXFLAGS -march=haswell"
+cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib/haswell -DCMAKE_AR=/usr/bin/gcc-ar -DCMAKE_RANLIB=/usr/bin/gcc-ranlib
+make VERBOSE=1  %{?_smp_mflags}  || :
 popd
 
 %install
+export SOURCE_DATE_EPOCH=1501847627
 rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/lib64/haswell/avx512_1
+pushd clr-build-avx2
+%make_install  || :
+mv %{buildroot}/usr/lib64/*so* %{buildroot}/usr/lib64/haswell/ || :
+popd
+rm -f %{buildroot}/usr/bin/*
 pushd clr-build
 %make_install
 popd
@@ -143,10 +161,13 @@ popd
 %files dev
 %defattr(-,root,root,-)
 /usr/include/lensfun/lensfun.h
+/usr/lib64/haswell/liblensfun.so
 /usr/lib64/liblensfun.so
 /usr/lib64/pkgconfig/lensfun.pc
 
 %files lib
 %defattr(-,root,root,-)
+/usr/lib64/haswell/liblensfun.so.0.3.2
+/usr/lib64/haswell/liblensfun.so.1
 /usr/lib64/liblensfun.so.0.3.2
 /usr/lib64/liblensfun.so.1
