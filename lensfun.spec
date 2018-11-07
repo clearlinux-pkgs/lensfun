@@ -4,26 +4,41 @@
 #
 Name     : lensfun
 Version  : 0.3.2
-Release  : 8
+Release  : 9
 URL      : https://sourceforge.net/projects/lensfun/files/0.3.2/lensfun-0.3.2.tar.gz
 Source0  : https://sourceforge.net/projects/lensfun/files/0.3.2/lensfun-0.3.2.tar.gz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : GPL-2.0
-Requires: lensfun-bin
-Requires: lensfun-lib
-Requires: lensfun-data
+Requires: lensfun-bin = %{version}-%{release}
+Requires: lensfun-data = %{version}-%{release}
+Requires: lensfun-lib = %{version}-%{release}
+Requires: lensfun-license = %{version}-%{release}
+BuildRequires : buildreq-cmake
 BuildRequires : cmake
+BuildRequires : doxygen
+BuildRequires : extra-cmake-modules pkgconfig(glib-2.0)
 BuildRequires : glib-dev
+BuildRequires : libpng-dev
+BuildRequires : python3
 
 %description
 This is a subset of the TRE regular expression library:
 Home page: http://www.laurikari.net/tre/index.html
 
+%package abi
+Summary: abi components for the lensfun package.
+Group: Default
+
+%description abi
+abi components for the lensfun package.
+
+
 %package bin
 Summary: bin components for the lensfun package.
 Group: Binaries
-Requires: lensfun-data
+Requires: lensfun-data = %{version}-%{release}
+Requires: lensfun-license = %{version}-%{release}
 
 %description bin
 bin components for the lensfun package.
@@ -40,10 +55,10 @@ data components for the lensfun package.
 %package dev
 Summary: dev components for the lensfun package.
 Group: Development
-Requires: lensfun-lib
-Requires: lensfun-bin
-Requires: lensfun-data
-Provides: lensfun-devel
+Requires: lensfun-lib = %{version}-%{release}
+Requires: lensfun-bin = %{version}-%{release}
+Requires: lensfun-data = %{version}-%{release}
+Provides: lensfun-devel = %{version}-%{release}
 
 %description dev
 dev components for the lensfun package.
@@ -52,10 +67,19 @@ dev components for the lensfun package.
 %package lib
 Summary: lib components for the lensfun package.
 Group: Libraries
-Requires: lensfun-data
+Requires: lensfun-data = %{version}-%{release}
+Requires: lensfun-license = %{version}-%{release}
 
 %description lib
 lib components for the lensfun package.
+
+
+%package license
+Summary: license components for the lensfun package.
+Group: Default
+
+%description license
+license components for the lensfun package.
 
 
 %prep
@@ -72,8 +96,8 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1514669338
-mkdir clr-build
+export SOURCE_DATE_EPOCH=1541614859
+mkdir -p clr-build
 pushd clr-build
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -82,10 +106,10 @@ export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-m
 export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
 export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
 export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib64 -DCMAKE_AR=/usr/bin/gcc-ar -DLIB_SUFFIX=64 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_RANLIB=/usr/bin/gcc-ranlib
-make VERBOSE=1  %{?_smp_mflags}
+%cmake ..
+make  %{?_smp_mflags} VERBOSE=1
 popd
-mkdir clr-build-avx2
+mkdir -p clr-build-avx2
 pushd clr-build-avx2
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -94,12 +118,12 @@ export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-m
 export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
 export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
 export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
-export CFLAGS="$CFLAGS -march=haswell"
-export CXXFLAGS="$CXXFLAGS -march=haswell"
-cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib/haswell -DCMAKE_AR=/usr/bin/gcc-ar -DCMAKE_RANLIB=/usr/bin/gcc-ranlib
-make VERBOSE=1  %{?_smp_mflags}  || :
+export CFLAGS="$CFLAGS -march=haswell -m64"
+export CXXFLAGS="$CXXFLAGS -march=haswell -m64"
+%cmake ..
+make  %{?_smp_mflags} VERBOSE=1
 popd
-mkdir clr-build-avx512
+mkdir -p clr-build-avx512
 pushd clr-build-avx512
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -108,33 +132,34 @@ export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-m
 export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=skylake-avx512 "
 export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=skylake-avx512 "
 export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=skylake-avx512 "
-export CFLAGS="$CFLAGS -march=skylake-avx512"
-export CXXFLAGS="$CXXFLAGS -march=skylake-avx512"
-cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib/haswell/avx512_1 -DCMAKE_AR=/usr/bin/gcc-ar -DCMAKE_RANLIB=/usr/bin/gcc-ranlib
-make VERBOSE=1  %{?_smp_mflags}  || :
+export CFLAGS="$CFLAGS -march=skylake-avx512 -m64 "
+export CXXFLAGS="$CXXFLAGS -march=skylake-avx512 -m64 "
+%cmake ..
+make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1514669338
+export SOURCE_DATE_EPOCH=1541614859
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/usr/lib64/haswell/avx512_1
-pushd clr-build-avx2
-%make_install  || :
-mv %{buildroot}/usr/lib64/*so* %{buildroot}/usr/lib64/haswell/ || :
-popd
-rm -f %{buildroot}/usr/bin/*
-mkdir -p %{buildroot}/usr/lib64/haswell/avx512_1
+mkdir -p %{buildroot}/usr/share/package-licenses/lensfun
+cp libs/getopt/LICENSE %{buildroot}/usr/share/package-licenses/lensfun/libs_getopt_LICENSE
 pushd clr-build-avx512
-%make_install  || :
-mv %{buildroot}/usr/lib64/*so* %{buildroot}/usr/lib64/haswell/avx512_1 || :
+%make_install_avx512  || :
 popd
-rm -f %{buildroot}/usr/bin/*
+pushd clr-build-avx2
+%make_install_avx2  || :
+popd
 pushd clr-build
 %make_install
 popd
 
 %files
 %defattr(-,root,root,-)
+
+%files abi
+%defattr(-,root,root,-)
+/usr/share/abi/liblensfun.so.0.3.2.abi
+/usr/share/abi/liblensfun.so.1.abi
 
 %files bin
 %defattr(-,root,root,-)
@@ -201,16 +226,20 @@ popd
 %files dev
 %defattr(-,root,root,-)
 /usr/include/lensfun/lensfun.h
+/usr/lib64/haswell/avx512_1/liblensfun.so
 /usr/lib64/haswell/liblensfun.so
 /usr/lib64/liblensfun.so
 /usr/lib64/pkgconfig/lensfun.pc
 
 %files lib
 %defattr(-,root,root,-)
-/usr/lib64/haswell/avx512_1/liblensfun.so
 /usr/lib64/haswell/avx512_1/liblensfun.so.0.3.2
 /usr/lib64/haswell/avx512_1/liblensfun.so.1
 /usr/lib64/haswell/liblensfun.so.0.3.2
 /usr/lib64/haswell/liblensfun.so.1
 /usr/lib64/liblensfun.so.0.3.2
 /usr/lib64/liblensfun.so.1
+
+%files license
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/lensfun/libs_getopt_LICENSE
