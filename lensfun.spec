@@ -4,7 +4,7 @@
 #
 Name     : lensfun
 Version  : 0.3.2
-Release  : 9
+Release  : 10
 URL      : https://sourceforge.net/projects/lensfun/files/0.3.2/lensfun-0.3.2.tar.gz
 Source0  : https://sourceforge.net/projects/lensfun/files/0.3.2/lensfun-0.3.2.tar.gz
 Summary  : No detailed summary available
@@ -25,14 +25,6 @@ BuildRequires : python3
 %description
 This is a subset of the TRE regular expression library:
 Home page: http://www.laurikari.net/tre/index.html
-
-%package abi
-Summary: abi components for the lensfun package.
-Group: Default
-
-%description abi
-abi components for the lensfun package.
-
 
 %package bin
 Summary: bin components for the lensfun package.
@@ -96,7 +88,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1541614859
+export SOURCE_DATE_EPOCH=1542746687
 mkdir -p clr-build
 pushd clr-build
 export AR=gcc-ar
@@ -139,7 +131,7 @@ make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1541614859
+export SOURCE_DATE_EPOCH=1542746687
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/lensfun
 cp libs/getopt/LICENSE %{buildroot}/usr/share/package-licenses/lensfun/libs_getopt_LICENSE
@@ -155,11 +147,6 @@ popd
 
 %files
 %defattr(-,root,root,-)
-
-%files abi
-%defattr(-,root,root,-)
-/usr/share/abi/liblensfun.so.0.3.2.abi
-/usr/share/abi/liblensfun.so.1.abi
 
 %files bin
 %defattr(-,root,root,-)
