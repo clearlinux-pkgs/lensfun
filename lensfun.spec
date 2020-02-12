@@ -4,10 +4,10 @@
 #
 Name     : lensfun
 Version  : 0.3.2
-Release  : 12
+Release  : 13
 URL      : https://sourceforge.net/projects/lensfun/files/0.3.2/lensfun-0.3.2.tar.gz
 Source0  : https://sourceforge.net/projects/lensfun/files/0.3.2/lensfun-0.3.2.tar.gz
-Summary  : No detailed summary available
+Summary  : database of photographic lenses and their characteristics
 Group    : Development/Tools
 License  : GPL-2.0
 Requires: lensfun-bin = %{version}-%{release}
@@ -51,6 +51,7 @@ Requires: lensfun-lib = %{version}-%{release}
 Requires: lensfun-bin = %{version}-%{release}
 Requires: lensfun-data = %{version}-%{release}
 Provides: lensfun-devel = %{version}-%{release}
+Requires: lensfun = %{version}-%{release}
 
 %description dev
 dev components for the lensfun package.
@@ -76,21 +77,17 @@ license components for the lensfun package.
 
 %prep
 %setup -q -n lensfun-0.3.2
-pushd ..
-cp -a lensfun-0.3.2 buildavx2
-popd
-pushd ..
-cp -a lensfun-0.3.2 buildavx512
-popd
+cd %{_builddir}/lensfun-0.3.2
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1542746687
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1581532509
 mkdir -p clr-build
 pushd clr-build
+export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
@@ -98,11 +95,12 @@ export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-m
 export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
 export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
 export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-%cmake ..
-make  %{?_smp_mflags} VERBOSE=1
+%cmake .. -DBUILD_LENSTOOL=ON
+make  %{?_smp_mflags}  VERBOSE=1
 popd
 mkdir -p clr-build-avx2
 pushd clr-build-avx2
+export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
@@ -112,11 +110,12 @@ export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-m
 export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
 export CFLAGS="$CFLAGS -march=haswell -m64"
 export CXXFLAGS="$CXXFLAGS -march=haswell -m64"
-%cmake ..
-make  %{?_smp_mflags} VERBOSE=1
+%cmake .. -DBUILD_LENSTOOL=ON
+make  %{?_smp_mflags}  VERBOSE=1
 popd
 mkdir -p clr-build-avx512
 pushd clr-build-avx512
+export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
@@ -126,15 +125,15 @@ export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-m
 export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=skylake-avx512 "
 export CFLAGS="$CFLAGS -march=skylake-avx512 -m64 "
 export CXXFLAGS="$CXXFLAGS -march=skylake-avx512 -m64 "
-%cmake ..
-make  %{?_smp_mflags} VERBOSE=1
+%cmake .. -DBUILD_LENSTOOL=ON
+make  %{?_smp_mflags}  VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1542746687
+export SOURCE_DATE_EPOCH=1581532509
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/lensfun
-cp libs/getopt/LICENSE %{buildroot}/usr/share/package-licenses/lensfun/libs_getopt_LICENSE
+cp %{_builddir}/lensfun-0.3.2/libs/getopt/LICENSE %{buildroot}/usr/share/package-licenses/lensfun/2342b5a533465db8848a7b70870b9d15db736ab7
 pushd clr-build-avx512
 %make_install_avx512  || :
 popd
@@ -151,8 +150,11 @@ popd
 %files bin
 %defattr(-,root,root,-)
 /usr/bin/g-lensfun-update-data
+/usr/bin/haswell/avx512_1/lenstool
+/usr/bin/haswell/lenstool
 /usr/bin/lensfun-add-adapter
 /usr/bin/lensfun-update-data
+/usr/bin/lenstool
 
 %files data
 %defattr(-,root,root,-)
@@ -229,4 +231,4 @@ popd
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/package-licenses/lensfun/libs_getopt_LICENSE
+/usr/share/package-licenses/lensfun/2342b5a533465db8848a7b70870b9d15db736ab7
