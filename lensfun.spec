@@ -4,7 +4,7 @@
 #
 Name     : lensfun
 Version  : 0.3.2
-Release  : 14
+Release  : 15
 URL      : https://github.com/lensfun/lensfun/archive/v0.3.2/lensfun-0.3.2.tar.gz
 Source0  : https://github.com/lensfun/lensfun/archive/v0.3.2/lensfun-0.3.2.tar.gz
 Summary  : database of photographic lenses and their characteristics
@@ -14,6 +14,8 @@ Requires: lensfun-bin = %{version}-%{release}
 Requires: lensfun-data = %{version}-%{release}
 Requires: lensfun-lib = %{version}-%{release}
 Requires: lensfun-license = %{version}-%{release}
+Requires: lensfun-python = %{version}-%{release}
+Requires: lensfun-python3 = %{version}-%{release}
 BuildRequires : buildreq-cmake
 BuildRequires : cmake
 BuildRequires : doxygen
@@ -21,6 +23,7 @@ BuildRequires : extra-cmake-modules pkgconfig(glib-2.0)
 BuildRequires : glib-dev
 BuildRequires : libpng-dev
 BuildRequires : python3
+Patch1: 0001-Install-Python-libs-under-buildroot.patch
 
 %description
 This is a subset of the TRE regular expression library:
@@ -75,16 +78,35 @@ Group: Default
 license components for the lensfun package.
 
 
+%package python
+Summary: python components for the lensfun package.
+Group: Default
+Requires: lensfun-python3 = %{version}-%{release}
+
+%description python
+python components for the lensfun package.
+
+
+%package python3
+Summary: python3 components for the lensfun package.
+Group: Default
+Requires: python3-core
+
+%description python3
+python3 components for the lensfun package.
+
+
 %prep
 %setup -q -n lensfun-0.3.2
 cd %{_builddir}/lensfun-0.3.2
+%patch1 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1581533918
+export SOURCE_DATE_EPOCH=1582050396
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -130,7 +152,7 @@ make  %{?_smp_mflags}  VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1581533918
+export SOURCE_DATE_EPOCH=1582050396
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/lensfun
 cp %{_builddir}/lensfun-0.3.2/libs/getopt/LICENSE %{buildroot}/usr/share/package-licenses/lensfun/2342b5a533465db8848a7b70870b9d15db736ab7
@@ -232,3 +254,10 @@ popd
 %files license
 %defattr(0644,root,root,0755)
 /usr/share/package-licenses/lensfun/2342b5a533465db8848a7b70870b9d15db736ab7
+
+%files python
+%defattr(-,root,root,-)
+
+%files python3
+%defattr(-,root,root,-)
+/usr/lib/python3*/*
