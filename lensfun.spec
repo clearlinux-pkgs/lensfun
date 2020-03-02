@@ -4,7 +4,7 @@
 #
 Name     : lensfun
 Version  : 0.3.2
-Release  : 15
+Release  : 16
 URL      : https://github.com/lensfun/lensfun/archive/v0.3.2/lensfun-0.3.2.tar.gz
 Source0  : https://github.com/lensfun/lensfun/archive/v0.3.2/lensfun-0.3.2.tar.gz
 Summary  : database of photographic lenses and their characteristics
@@ -26,8 +26,16 @@ BuildRequires : python3
 Patch1: 0001-Install-Python-libs-under-buildroot.patch
 
 %description
-This is a subset of the TRE regular expression library:
-Home page: http://www.laurikari.net/tre/index.html
+WHAT IS IT
+----------
+The goal of the Lensfun library is to provide a open source database
+of photographic lenses and their characteristics. In the past there
+was a effort in this direction (see http://www.epaperpress.com/ptlens/),
+but then author decided to take the commercial route and the database
+froze at the last public stage. This database was used as the basement
+on which Lensfun database grew, thanks to PTLens author which gave his
+permission for this, while the code was totally rewritten from scratch
+(and the database was converted to a totally new, XML-based format).
 
 %package bin
 Summary: bin components for the lensfun package.
@@ -54,6 +62,7 @@ Requires: lensfun-lib = %{version}-%{release}
 Requires: lensfun-bin = %{version}-%{release}
 Requires: lensfun-data = %{version}-%{release}
 Provides: lensfun-devel = %{version}-%{release}
+Requires: lensfun = %{version}-%{release}
 Requires: lensfun = %{version}-%{release}
 
 %description dev
@@ -106,9 +115,10 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1582050396
+export SOURCE_DATE_EPOCH=1583166446
 mkdir -p clr-build
 pushd clr-build
+# -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -122,6 +132,7 @@ make  %{?_smp_mflags}  VERBOSE=1
 popd
 mkdir -p clr-build-avx2
 pushd clr-build-avx2
+# -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -137,6 +148,7 @@ make  %{?_smp_mflags}  VERBOSE=1
 popd
 mkdir -p clr-build-avx512
 pushd clr-build-avx512
+# -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -152,7 +164,7 @@ make  %{?_smp_mflags}  VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1582050396
+export SOURCE_DATE_EPOCH=1583166446
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/lensfun
 cp %{_builddir}/lensfun-0.3.2/libs/getopt/LICENSE %{buildroot}/usr/share/package-licenses/lensfun/2342b5a533465db8848a7b70870b9d15db736ab7
