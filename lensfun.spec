@@ -4,7 +4,7 @@
 #
 Name     : lensfun
 Version  : 0.3.2
-Release  : 18
+Release  : 19
 URL      : https://github.com/lensfun/lensfun/archive/v0.3.2/lensfun-0.3.2.tar.gz
 Source0  : https://github.com/lensfun/lensfun/archive/v0.3.2/lensfun-0.3.2.tar.gz
 Summary  : database of photographic lenses and their characteristics
