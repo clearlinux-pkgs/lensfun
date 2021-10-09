@@ -4,7 +4,7 @@
 #
 Name     : lensfun
 Version  : 0.3.2
-Release  : 26
+Release  : 27
 URL      : https://github.com/lensfun/lensfun/archive/v0.3.2/lensfun-0.3.2.tar.gz
 Source0  : https://github.com/lensfun/lensfun/archive/v0.3.2/lensfun-0.3.2.tar.gz
 Summary  : database of photographic lenses and their characteristics
@@ -12,6 +12,7 @@ Group    : Development/Tools
 License  : GPL-2.0
 Requires: lensfun-bin = %{version}-%{release}
 Requires: lensfun-data = %{version}-%{release}
+Requires: lensfun-filemap = %{version}-%{release}
 Requires: lensfun-lib = %{version}-%{release}
 Requires: lensfun-license = %{version}-%{release}
 Requires: lensfun-python = %{version}-%{release}
@@ -26,22 +27,15 @@ BuildRequires : python3
 Patch1: 0001-Install-Python-libs-under-buildroot.patch
 
 %description
-WHAT IS IT
-----------
-The goal of the Lensfun library is to provide a open source database
-of photographic lenses and their characteristics. In the past there
-was a effort in this direction (see http://www.epaperpress.com/ptlens/),
-but then author decided to take the commercial route and the database
-froze at the last public stage. This database was used as the basement
-on which Lensfun database grew, thanks to PTLens author which gave his
-permission for this, while the code was totally rewritten from scratch
-(and the database was converted to a totally new, XML-based format).
+This is a subset of the TRE regular expression library:
+Home page: http://www.laurikari.net/tre/index.html
 
 %package bin
 Summary: bin components for the lensfun package.
 Group: Binaries
 Requires: lensfun-data = %{version}-%{release}
 Requires: lensfun-license = %{version}-%{release}
+Requires: lensfun-filemap = %{version}-%{release}
 
 %description bin
 bin components for the lensfun package.
@@ -63,10 +57,17 @@ Requires: lensfun-bin = %{version}-%{release}
 Requires: lensfun-data = %{version}-%{release}
 Provides: lensfun-devel = %{version}-%{release}
 Requires: lensfun = %{version}-%{release}
-Requires: lensfun = %{version}-%{release}
 
 %description dev
 dev components for the lensfun package.
+
+
+%package filemap
+Summary: filemap components for the lensfun package.
+Group: Default
+
+%description filemap
+filemap components for the lensfun package.
 
 
 %package lib
@@ -74,6 +75,7 @@ Summary: lib components for the lensfun package.
 Group: Libraries
 Requires: lensfun-data = %{version}-%{release}
 Requires: lensfun-license = %{version}-%{release}
+Requires: lensfun-filemap = %{version}-%{release}
 
 %description lib
 lib components for the lensfun package.
@@ -91,6 +93,7 @@ license components for the lensfun package.
 Summary: python components for the lensfun package.
 Group: Default
 Requires: lensfun-python3 = %{version}-%{release}
+Requires: lensfun-filemap = %{version}-%{release}
 
 %description python
 python components for the lensfun package.
@@ -115,64 +118,67 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1583166446
+export SOURCE_DATE_EPOCH=1633755482
 mkdir -p clr-build
 pushd clr-build
-# -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export CFLAGS="$CFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=256 "
+export FCFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=256 "
+export FFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=256 "
+export CXXFLAGS="$CXXFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=256 "
 %cmake .. -DBUILD_LENSTOOL=ON
-make  %{?_smp_mflags}  VERBOSE=1
+make  %{?_smp_mflags}
 popd
 mkdir -p clr-build-avx2
 pushd clr-build-avx2
-# -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
-export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
-export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
-export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
-export CFLAGS="$CFLAGS -march=haswell -m64"
-export CXXFLAGS="$CXXFLAGS -march=haswell -m64"
+export CFLAGS="$CFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=256 -mtune=skylake "
+export FCFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=256 -mtune=skylake "
+export FFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=256 -mtune=skylake "
+export CXXFLAGS="$CXXFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=256 -mtune=skylake "
+export CFLAGS="$CFLAGS -march=x86-64-v3 -m64"
+export CXXFLAGS="$CXXFLAGS -march=x86-64-v3 -m64"
+export FFLAGS="$FFLAGS -march=x86-64-v3 -m64"
+export FCFLAGS="$FCFLAGS -march=x86-64-v3 -m64"
 %cmake .. -DBUILD_LENSTOOL=ON
-make  %{?_smp_mflags}  VERBOSE=1
+make  %{?_smp_mflags}
 popd
 mkdir -p clr-build-avx512
 pushd clr-build-avx512
-# -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=skylake-avx512 "
-export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=skylake-avx512 "
-export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=skylake-avx512 "
-export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=skylake-avx512 "
-export CFLAGS="$CFLAGS -march=skylake-avx512 -m64 "
-export CXXFLAGS="$CXXFLAGS -march=skylake-avx512 -m64 "
+export CFLAGS="$CFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86_64-v4 -mprefer-vector-width=256 -mtune=skylake "
+export FCFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86_64-v4 -mprefer-vector-width=256 -mtune=skylake "
+export FFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86_64-v4 -mprefer-vector-width=256 -mtune=skylake "
+export CXXFLAGS="$CXXFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86_64-v4 -mprefer-vector-width=256 -mtune=skylake "
+export CFLAGS="$CFLAGS -march=x86-64-v4 -m64 "
+export CXXFLAGS="$CXXFLAGS -march=x86-64-v4 -m64 "
+export FFLAGS="$FFLAGS -march=x86-64-v4 -m64 "
+export FCFLAGS="$FCFLAGS -march=x86-64-v4 -m64 "
 %cmake .. -DBUILD_LENSTOOL=ON
-make  %{?_smp_mflags}  VERBOSE=1
+make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1583166446
+export SOURCE_DATE_EPOCH=1633755482
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/lensfun
 cp %{_builddir}/lensfun-0.3.2/libs/getopt/LICENSE %{buildroot}/usr/share/package-licenses/lensfun/2342b5a533465db8848a7b70870b9d15db736ab7
-pushd clr-build-avx512
-%make_install_avx512  || :
-popd
 pushd clr-build-avx2
-%make_install_avx2  || :
+%make_install_v3  || :
+/usr/bin/elf-move.py avx2 %{buildroot}-v3 %{buildroot}/usr/share/clear/optimized-elf/ %{buildroot}/usr/share/clear/filemap/filemap-%{name}
+popd
+pushd clr-build-avx512
+%make_install_v4  || :
+/usr/bin/elf-move.py avx512 %{buildroot}-v4 %{buildroot}/usr/share/clear/optimized-elf/ %{buildroot}/usr/share/clear/filemap/filemap-%{name}
 popd
 pushd clr-build
 %make_install
@@ -184,11 +190,10 @@ popd
 %files bin
 %defattr(-,root,root,-)
 /usr/bin/g-lensfun-update-data
-/usr/bin/haswell/avx512_1/lenstool
-/usr/bin/haswell/lenstool
 /usr/bin/lensfun-add-adapter
 /usr/bin/lensfun-update-data
 /usr/bin/lenstool
+/usr/share/clear/optimized-elf/bin*
 
 %files data
 %defattr(-,root,root,-)
@@ -249,19 +254,18 @@ popd
 %files dev
 %defattr(-,root,root,-)
 /usr/include/lensfun/lensfun.h
-/usr/lib64/haswell/avx512_1/liblensfun.so
-/usr/lib64/haswell/liblensfun.so
 /usr/lib64/liblensfun.so
 /usr/lib64/pkgconfig/lensfun.pc
 
+%files filemap
+%defattr(-,root,root,-)
+/usr/share/clear/filemap/filemap-lensfun
+
 %files lib
 %defattr(-,root,root,-)
-/usr/lib64/haswell/avx512_1/liblensfun.so.0.3.2
-/usr/lib64/haswell/avx512_1/liblensfun.so.1
-/usr/lib64/haswell/liblensfun.so.0.3.2
-/usr/lib64/haswell/liblensfun.so.1
 /usr/lib64/liblensfun.so.0.3.2
 /usr/lib64/liblensfun.so.1
+/usr/share/clear/optimized-elf/lib*
 
 %files license
 %defattr(0644,root,root,0755)
