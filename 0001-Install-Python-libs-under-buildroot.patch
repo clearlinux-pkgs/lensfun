@@ -1,4 +1,4 @@
-From 03d3b6b1cf88f5f2d1fabfe0f5cec6d37f680ac8 Mon Sep 17 00:00:00 2001
+From 4d15680460cfb302829189bc71357302529330b5 Mon Sep 17 00:00:00 2001
 From: "Brett T. Warden" <brett.t.warden@intel.com>
 Date: Tue, 18 Feb 2020 09:56:30 -0800
 Subject: [PATCH] Install Python libs under buildroot
@@ -8,16 +8,16 @@ Subject: [PATCH] Install Python libs under buildroot
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/apps/CMakeLists.txt b/apps/CMakeLists.txt
-index 70c77fd..00bf647 100644
+index 2f6f8f14f9c2..772799f52ab7 100644
 --- a/apps/CMakeLists.txt
 +++ b/apps/CMakeLists.txt
 @@ -42,5 +42,5 @@ IF(PYTHON)
      IF(NOT DEFINED SETUP_PY_INSTALL_PREFIX)
        SET(SETUP_PY_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
      ENDIF()
--    INSTALL(CODE "execute_process(COMMAND ${PYTHON} ${SETUP_PY} install --prefix=${SETUP_PY_INSTALL_PREFIX})")
+-    INSTALL(CODE "execute_process(COMMAND ${PYTHON} ${SETUP_PY} install --prefix=\$ENV{DESTDIR}${SETUP_PY_INSTALL_PREFIX})")
 +    INSTALL(CODE "execute_process(COMMAND ${PYTHON} ${SETUP_PY} install --root=\$ENV{INSTALL_ROOT} --prefix=${SETUP_PY_INSTALL_PREFIX})")
  ENDIF(PYTHON)
 -- 
-2.25.0
+2.39.1
 
