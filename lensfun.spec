@@ -4,10 +4,10 @@
 # Using build pattern: cmake
 #
 Name     : lensfun
-Version  : 0.3.3
-Release  : 47
-URL      : https://github.com/lensfun/lensfun/archive/v0.3.3/lensfun-0.3.3.tar.gz
-Source0  : https://github.com/lensfun/lensfun/archive/v0.3.3/lensfun-0.3.3.tar.gz
+Version  : 0.3.4
+Release  : 48
+URL      : https://github.com/lensfun/lensfun/archive/v0.3.4/lensfun-0.3.4.tar.gz
+Source0  : https://github.com/lensfun/lensfun/archive/v0.3.4/lensfun-0.3.4.tar.gz
 Summary  : database of photographic lenses and their characteristics
 Group    : Development/Tools
 License  : GPL-2.0
@@ -23,6 +23,7 @@ BuildRequires : doxygen
 BuildRequires : extra-cmake-modules pkgconfig(glib-2.0)
 BuildRequires : glib-dev
 BuildRequires : libpng-dev
+BuildRequires : pkg-config
 BuildRequires : python3
 # Suppress stripping binaries
 %define __strip /bin/true
@@ -101,16 +102,16 @@ python3 components for the lensfun package.
 
 
 %prep
-%setup -q -n lensfun-0.3.3
-cd %{_builddir}/lensfun-0.3.3
-%patch1 -p1
+%setup -q -n lensfun-0.3.4
+cd %{_builddir}/lensfun-0.3.4
+%patch -P 1 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1685635355
+export SOURCE_DATE_EPOCH=1691447040
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -160,7 +161,7 @@ make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1685635355
+export SOURCE_DATE_EPOCH=1691447040
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/lensfun
 cp %{_builddir}/lensfun-%{version}/libs/getopt/LICENSE %{buildroot}/usr/share/package-licenses/lensfun/2342b5a533465db8848a7b70870b9d15db736ab7 || :
@@ -223,6 +224,7 @@ popd
 /usr/share/lensfun/version_1/mil-tokina.xml
 /usr/share/lensfun/version_1/mil-zeiss.xml
 /usr/share/lensfun/version_1/misc.xml
+/usr/share/lensfun/version_1/om-system.xml
 /usr/share/lensfun/version_1/rf-leica.xml
 /usr/share/lensfun/version_1/slr-canon.xml
 /usr/share/lensfun/version_1/slr-hasselblad.xml
@@ -254,9 +256,9 @@ popd
 
 %files lib
 %defattr(-,root,root,-)
-/V3/usr/lib64/liblensfun.so.0.3.3
-/V4/usr/lib64/liblensfun.so.0.3.3
-/usr/lib64/liblensfun.so.0.3.3
+/V3/usr/lib64/liblensfun.so.0.3.4
+/V4/usr/lib64/liblensfun.so.0.3.4
+/usr/lib64/liblensfun.so.0.3.4
 /usr/lib64/liblensfun.so.1
 
 %files license
